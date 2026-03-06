@@ -33,5 +33,30 @@ def about(station, date):
     return result_dict
 
 
+@app.route("/api/v1/<station>")
+def all_data(station):
+    station_string = str(station).zfill(6)
+    path = f"data_small\TG_STAID{station_string}.txt"
+
+    df = pd.read_csv(path, skiprows=20, parse_dates=["    DATE"])
+    result = df.to_dict(orient="records")
+
+    return result
+
+
+@app.route("/api/v1/yearly/<station>/<year>")
+def yearly(station, year):
+    station_string = str(station).zfill(6)
+    path = f"data_small\TG_STAID{station_string}.txt"
+
+    df = pd.read_csv(path, skiprows=20)
+    df['    DATE'] = df['    DATE'].astype(str)
+    result = df[df["    DATE"].str.startswith(str(year))]
+
+    print(result)
+
+    return result.to_dict(orient="records")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
